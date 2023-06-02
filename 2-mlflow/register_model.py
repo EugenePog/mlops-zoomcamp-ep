@@ -81,9 +81,10 @@ def run_register_model(data_path: str, top_n: int):
     #print(best_run.data.metrics['test_rmse'])
 
     # Register the best model
-	best_run_id = best_run.info.run_id
+	#best_run_id = best_run.info.run_id
     #print(best_run_id)
-    model_uri = "runs:/"+str(best_run_id)+"/model"
+    #model_uri = "runs:/"+str(best_run_id)+"/model"
+    model_uri = f"runs:/{best_run.info.run_id}/model"
     #print(model_uri)
     mlflow.register_model(model_uri=model_uri, name='green-taxi-random-forest-regressor-best')
 

@@ -110,16 +110,15 @@ def train_best_model(
         mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
     return None
 
-@task
-def send_message_task(message = 'undefined'):
+@task(name="email notification")
+def send_message_task(message):
     email_credentials = EmailServerCredentials.load("notificator")
 
     subject = email_send_message(
         email_credentials=email_credentials,
         subject="Example Flow Notification",
         msg="This proves email_send_message: " + message,
-        email_to="eugene.pogulyay@gmail.com",
-    )
+        email_to="eugene.pogulyay@gmail.com")
     return subject
 
 @flow
@@ -141,7 +140,7 @@ def main_flow(
     X_train, X_val, y_train, y_val, dv = add_features(df_train, df_val)
 
     # Train
-    #train_best_model(X_train, X_val, y_train, y_val, dv)
+    train_best_model(X_train, X_val, y_train, y_val, dv)
 
     #Send message OK
     send_message_task('ok')

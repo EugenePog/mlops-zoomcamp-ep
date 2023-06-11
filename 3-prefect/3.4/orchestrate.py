@@ -11,7 +11,7 @@ import xgboost as xgb
 from prefect import flow, task
 
 
-@task(retries=3, retry_delay_seconds=2)
+@task(retries=3, retry_delay_seconds=2, name="Read taxi data")
 def read_data(filename: str) -> pd.DataFrame:
     """Read data into DataFrame"""
     df = pd.read_parquet(filename)
@@ -30,7 +30,7 @@ def read_data(filename: str) -> pd.DataFrame:
     return df
 
 
-@task
+@task(name="Add features to data")
 def add_features(
     df_train: pd.DataFrame, df_val: pd.DataFrame
 ) -> tuple(
@@ -62,7 +62,7 @@ def add_features(
     return X_train, X_val, y_train, y_val, dv
 
 
-@task(log_prints=True)
+@task(log_prints=True, name="Train the model")
 def train_best_model(
     X_train: scipy.sparse._csr.csr_matrix,
     X_val: scipy.sparse._csr.csr_matrix,
@@ -111,8 +111,8 @@ def train_best_model(
 
 @flow
 def main_flow(
-    train_path: str = "../data/taxi/green_tripdata_2022-01.parquet",
-    val_path: str = "../data/taxi/green_tripdata_2022-02.parquet",
+    train_path: str = "data_for_prefect/green_tripdata_2023-01.parquet",
+    val_path: str = "data_for_prefect/green_tripdata_2023-02.parquet",
 ) -> None:
     """The main training pipeline"""
 

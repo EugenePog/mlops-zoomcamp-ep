@@ -9,6 +9,8 @@ from sklearn.metrics import mean_squared_error
 import mlflow
 import xgboost as xgb
 from prefect import flow, task
+from prefect_email import EmailServerCredentials
+from prefect_email import email_send_message
 
 
 @task(retries=3, retry_delay_seconds=2, name="Read taxi data")
@@ -108,11 +110,22 @@ def train_best_model(
         mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
     return None
 
+@task
+def send_message_task(message = 'undefined'):
+    email_credentials = EmailServerCredentials.load("notificator")
+
+    subject = email_send_message(
+        email_credentials=email_credentials,
+        subject="Example Flow Notification",
+        msg="This proves email_send_message: " + message,
+        email_to="eugene.pogulyay@gmail.com",
+    )
+    return subject
 
 @flow
 def main_flow(
-    train_path: str = "data_for_prefect/green_tripdata_2023-01.parquet",
-    val_path: str = "data_for_prefect/green_tripdata_2023-02.parquet",
+    train_path: str = "data_for_prefect/green_tripdata_2023-02.parquet",
+    val_path: str = "data_for_prefect/green_tripdata_2023-03.parquet",
 ) -> None:
     """The main training pipeline"""
 
@@ -128,8 +141,10 @@ def main_flow(
     X_train, X_val, y_train, y_val, dv = add_features(df_train, df_val)
 
     # Train
-    train_best_model(X_train, X_val, y_train, y_val, dv)
+    #train_best_model(X_train, X_val, y_train, y_val, dv)
 
+    #Send message OK
+    send_message_task('ok')
 
 if __name__ == "__main__":
     main_flow()

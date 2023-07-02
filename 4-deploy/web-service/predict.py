@@ -19,12 +19,12 @@ def predict(features):
     return float(preds[0])
 
 
-app = Flask('duration-prediction')
+#app = Flask('duration-prediction')
 
 
-@app.route('/predict', methods=['POST'])
-def predict_endpoint():
-    ride = request.get_json()
+#@app.route('/predict', methods=['POST'])
+def predict_endpoint(ride):
+    #ride = request.get_json()
 
     features = prepare_features(ride)
     pred = predict(features)
@@ -33,7 +33,8 @@ def predict_endpoint():
         'duration': pred
     }
 
-    return jsonify(result)
+    #return jsonify(result)
+    return result
 
 
 if __name__ == "__main__":
